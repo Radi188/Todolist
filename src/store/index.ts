@@ -25,6 +25,13 @@ export const store = createStore({
             return e.id === paylaod.id
           })
           state.createTodoes.splice(getID , 1);
+      },
+      removeAllTodo(state , paylaod: ITodo){
+        const getAllTodo = state.createTodoes.length
+        state.createTodoes.splice(0 , getAllTodo);
+      },
+      removeAllDone(state , payload: ITodo){
+        return state.createTodoes = state.createTodoes.filter(e => e.status.done !== true)
       }
   },
   getters:{

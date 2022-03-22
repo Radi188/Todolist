@@ -6,7 +6,8 @@
         <div class="task-bar">
           <div class="tasks">Total Tasks: {{allTask}}</div>
            <div class="task-done">Tasks Done: {{taskDone}}</div>
-           <div class="task-delete">Tasks Delete</div>
+           <div v-if="removeDone.length > 0" @click="removeAllDone(todos)" class="remove-done">Remove task done: {{removeDone.length}}</div>
+           <div class="task-delete" @click="clickToRemove(todos)" >Tasks Delete </div>
         </div>
       </div>
       <div class="body-wrap">
@@ -42,6 +43,7 @@ export default defineComponent({
         todo.value = getters.getAllTodo;
       }
     }
+
     getTodoList();
     const allTask = computed(() => {
       const tasks = todo.value.length;
@@ -66,7 +68,19 @@ export default defineComponent({
     const clickToDelete = (todos: ITodo) => {
       commit('deleteTodo' , todos)
     }
-    return{todo , allTask , taskDone , nameTodo , addTodo, clickToDone , clickToDelete}
+    const clickToRemove = (todos: ITodo) => {
+      commit('removeAllTodo' , todos)
+    }
+    const removeDone = computed(() => {
+      const tasks = todo.value.filter (e => e.status.done === true)
+      return tasks
+    })
+    const removeAllDone = (todos: ITodo) => {
+      commit('removeAllDone' , todos)
+      todo.value = getters.getAllTodo;
+    }
+
+    return{todo , allTask , taskDone , nameTodo , addTodo, clickToDone , clickToDelete , clickToRemove, removeDone , removeAllDone}
   },
   
 })
@@ -111,28 +125,13 @@ export default defineComponent({
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-    .tasks{
-    width: 85px;
-    height: 35px;
-    background-color: rgb(216, 216, 216);
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-left: 3px;
-  }
-    .tasks{
-    width: 85px;
-    height: 35px;
-    background-color: aquamarine;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    border: 1.5px white solid;
+    border-radius: 5px;
     font-size: 12px;
     cursor: pointer;
+    margin-left: 3px;
   }
+  
   .task-done{
     width: 85px;
     height: 35px;
@@ -144,11 +143,13 @@ export default defineComponent({
     margin: 0 0 0 auto;
     font-size: 12px;
     cursor: pointer;
+    border: 1.5px white solid;
+    border-radius: 5px;
   }
   .task-delete{
     width: 85px;
     height: 35px;
-    background-color: aquamarine;
+    background-color: crimson;
     text-align: center;
     display: flex;
     justify-content: center;
@@ -156,6 +157,24 @@ export default defineComponent({
     margin: 0 0 0 auto;
     font-size: 12px;
     cursor: pointer;
+    border: 1.5px white solid;
+    border-radius: 5px;
+    color: white;
+  }
+  .remove-done{
+    width: 85px;
+    height: 35px;
+    background-color: crimson;
+    text-align: center;
+    display: flex;
+    color: white;
+    justify-content: center;
+    align-items: center;
+    margin: 0 0 0 auto;
+    font-size: 12px;
+    cursor: pointer;
+    border: 1.5px white solid;
+    border-radius: 5px;
   }
   .text-todo{
   height: 35px;
