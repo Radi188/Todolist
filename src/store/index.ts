@@ -1,12 +1,38 @@
-import { createStore } from 'vuex'
-// Create a new store instance.
-const store = createStore({
-  state: {count : 0},
+import ITodo from '@/models/ITodo'
+import { InjectionKey } from 'vue';
+import { createStore, Store ,useStore as baseUseStore  } from 'vuex'
+
+export const key: InjectionKey<Store<any>> = Symbol('Copy From Vuex Doc');
+export const store = createStore({
+  state: {
+      createTodoes: [] as Array<ITodo>
+  },
   mutations: {
-    increment (state) {
-      state.count++
-    }
+      createTodo(state , paylaod: ITodo) {
+        state.createTodoes.push(paylaod)
+      },
+      initTodo(state , paylaod: Array<ITodo>) {
+        state.createTodoes = paylaod;
+      },
+      updateStatus(state , paylaod: ITodo){
+         const getID =  state.createTodoes.findIndex(e => {
+            return e.id === paylaod.id
+          })
+          state.createTodoes[getID].status.done = true
+      },
+      deleteTodo(state , paylaod: ITodo){
+        const getID =  state.createTodoes.findIndex(e => {
+            return e.id === paylaod.id
+          })
+          state.createTodoes.splice(getID , 1);
+      }
+  },
+  getters:{
+      getAllTodo(state): Array<ITodo> {
+        return state.createTodoes;
+      }
   }
 })
-
-export default store
+export function useStore(): Store<any>{
+    return baseUseStore(key)
+}

@@ -11,14 +11,14 @@
       </div>
       <div class="body-wrap">
         <div  class="wrap-todo-item" v-for="todos in todo" :key="todos.status.done">
-            <button :disabled="todos.status.done" class="click-to-done">done</button>
+            <button :disabled="todos.status.done" class="click-to-done" @click="clickToDone(todos)">done</button>
             <p :class="{done : todos.status.done}" class="text-box">{{todos.name}}</p>
-            <button class="click-to-delete">delete</button>
+            <button class="click-to-delete" @click="clickToDelete(todos)">delete</button>
         </div>
       </div>
       <div class="footer-wrap">
-        <input class="text-todo" type="text">
-        <button class="btn-login todo">+</button>
+        <input id="kkk" class="text-todo" type="text" v-model="nameTodo">
+        <button class="btn-login todo" @click="addTodo">+</button>
       </div>
     </div>
   </div>
@@ -29,33 +29,44 @@
 import { computed, defineComponent, ref } from 'vue'
 import FakeApi from '@/libraries/FakeAPI'
 import ITodo from '@/models/ITodo';
+import {useStore} from '@/store/index'
+
 export default defineComponent({
   setup() {
-    
+    const {state, commit  , getters} = useStore();
     const todo = ref<Array<ITodo>>([]);
-    const tasked = todo.value.length
     const getTodoList = async() => {
       const res = await FakeApi.getTodoList();
       if(res.Error === 0){
-        todo.value = res.Data.TodoRespone;
+        commit('initTodo' , res.Data.TodoRespone);
+        todo.value = getters.getAllTodo;
       }
     }
-
     getTodoList();
-
     const allTask = computed(() => {
       const tasks = todo.value.length;
       return tasks
     })
-
+    const nameTodo = ref('');
+    const config = computed(() => {
+      const tasks = todo.value.length + 1;
+      return tasks
+    })
+    const addTodo = () => {
+      commit('createTodo' , {id: config.value , name: nameTodo.value , status: {done:false}})
+      nameTodo.value = '';
+    }
     const taskDone = computed(() =>{
       const tasks = todo.value.filter(e => e.status.done === true)
       return tasks.length
     })
-
-    const isDone = true
-    console.log(isDone);
-    return{todo , allTask , taskDone , isDone}
+    const clickToDone = (todos: ITodo) => {
+      commit('updateStatus' , todos)
+    }
+    const clickToDelete = (todos: ITodo) => {
+      commit('deleteTodo' , todos)
+    }
+    return{todo , allTask , taskDone , nameTodo , addTodo, clickToDone , clickToDelete}
   },
   
 })
