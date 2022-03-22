@@ -4,13 +4,17 @@
     <div class="wrap-todo-list">
       <div class="head-wrap">
         <div class="task-bar">
-          <div class="tasks">Tasks</div>
-           <div class="task-done">Tasks Done</div>
+          <div class="tasks">Total Tasks: {{allTask}}</div>
+           <div class="task-done">Tasks Done: {{taskDone}}</div>
            <div class="task-delete">Tasks Delete</div>
         </div>
       </div>
       <div class="body-wrap">
-        <div class="wrap-todo-item"></div>
+        <div  class="wrap-todo-item" v-for="todos in todo" :key="todos.status.done">
+            <button :disabled="todos.status.done" class="click-to-done">done</button>
+            <p :class="{done : todos.status.done}" class="text-box">{{todos.name}}</p>
+            <button class="click-to-delete">delete</button>
+        </div>
       </div>
       <div class="footer-wrap">
         <input class="text-todo" type="text">
@@ -22,19 +26,38 @@
 
 <script lang='ts'>
 
-import { defineComponent, ref } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
 import FakeApi from '@/libraries/FakeAPI'
 import ITodo from '@/models/ITodo';
 export default defineComponent({
   setup() {
+    
     const todo = ref<Array<ITodo>>([]);
-    const getTodoList = async(): Promise<void> => {
-      const response = await FakeApi.getTodoList();
-      if(response.Error === 0){
-        console.log(response);
+    const tasked = todo.value.length
+    const getTodoList = async() => {
+      const res = await FakeApi.getTodoList();
+      if(res.Error === 0){
+        todo.value = res.Data.TodoRespone;
       }
     }
+
+    getTodoList();
+
+    const allTask = computed(() => {
+      const tasks = todo.value.length;
+      return tasks
+    })
+
+    const taskDone = computed(() =>{
+      const tasks = todo.value.filter(e => e.status.done === true)
+      return tasks.length
+    })
+
+    const isDone = true
+    console.log(isDone);
+    return{todo , allTask , taskDone , isDone}
   },
+  
 })
 </script>
 
@@ -133,11 +156,40 @@ export default defineComponent({
   margin-right: 25px;
   }
   .wrap-todo-item{
-    height: 15%;
+    height: 10%;
     width: 80%;
     margin: 0 auto;
     background-color: white;
-    border-radius: 50px;
-    margin-bottom: 20px;
+    border-radius: 15px;
+    margin-bottom: 5px;
+    align-items: center;
+    justify-content: center;
+    text-align: left;
+    display: flex;
+    
+  }
+  .text-box{
+    padding: 10px 20px;
+  }
+  .click-to-done{
+    background-color: lightgreen;
+    color: black;
+    font-size: 12px;
+    width: 50px;
+    height: 30px;
+    border-radius: 5px ;
+    margin: 0 10px;
+  }
+    .click-to-delete{
+    background-color: crimson;
+    color: white;
+    font-size: 12px;
+    width: 50px;
+    height: 30px;
+    border-radius: 5px ;
+    margin: 0 10px;
+  }
+  .done{
+    text-decoration: line-through;
   }
 </style>

@@ -18,7 +18,7 @@ export default {
             },
             {
                 id: 3,
-                name: 'huy',
+                name: 'houy',
                 status: {done: false}
             },
             {
